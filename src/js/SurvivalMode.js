@@ -3,6 +3,7 @@
 
 import { Bubble, spawnBubble, handleBubbleCollision } from './bubbles.js';
 import { showMessageBox } from './ui/messageBox.js';
+import { highScoreService } from './services/HighScoreService.js';
 import { FloatingTextEffect } from './effects/FloatingTextEffect.js';
 import {
   effects,
@@ -508,9 +509,19 @@ export class SurvivalMode {
     const stats = scoringService.getCurrentStats();
     const totalScore = (stats && typeof stats.totalScore === 'number') ? stats.totalScore : 0;
 
+    const { isNewHighScore, previousBest } = highScoreService.saveScore('survival', totalScore);
+
+    const scoreFormatted = totalScore.toLocaleString();
+    let bodyText = 'Your final score is: ' + scoreFormatted + ' points';
+    if (isNewHighScore) {
+      bodyText += '\n🏆 New High Score!';
+    } else if (previousBest > 0) {
+      bodyText += '\nBest: ' + previousBest.toLocaleString();
+    }
+
     showMessageBox(
       "Time's Up!",
-      'Your final score is: ' + String(totalScore) + ' points',
+      bodyText,
       [{ label: 'Go to Main Menu', action: () => goToMainMenu() }]
     );
   }

@@ -2,6 +2,7 @@
 // Colour Rush Game Mode - Match target colors for points and combos
 
 import { showMessageBox, hideMessageBox } from './ui/messageBox.js';
+import { highScoreService } from './services/HighScoreService.js';
 import { 
   Bubble, 
   spawnBubble, 
@@ -298,10 +299,20 @@ export class ColourRushMode {
     const stars = this.calculateStarRating();
     const starDisplay = stars > 0 ? '⭐'.repeat(stars) : 'No stars';
 
+    const { isNewHighScore, previousBest } = highScoreService.saveScore('colourrush', finalScore);
+
+    const scoreFormatted = finalScore.toLocaleString();
+    let bodyText = `Final Score: ${scoreFormatted} points\nAccuracy: ${accuracy}%\n${starDisplay}`;
+    if (isNewHighScore) {
+      bodyText += '\n🏆 New High Score!';
+    } else if (previousBest > 0) {
+      bodyText += '\nBest: ' + previousBest.toLocaleString();
+    }
+
     // ✅ FIX #8: Use consistent goToMainMenu import
     showMessageBox(
       "Time's Up!",
-      `Final Score: ${finalScore} points\nAccuracy: ${accuracy}%\n${starDisplay}`,
+      bodyText,
       [{
         label: 'Main Menu',
         action: () => goToMainMenu()
