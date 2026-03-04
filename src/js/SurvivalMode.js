@@ -288,8 +288,7 @@ export class SurvivalMode {
 
     const gameState = {
       currentTime: now,
-      consecutivePops: this.consecutivePops,
-      isFreezeModeActive: false
+      consecutivePops: this.consecutivePops
     };
 
     if (activeBubbles < this.spawnConfig.minBubbles) {
@@ -386,17 +385,6 @@ export class SurvivalMode {
       const distance = Math.sqrt(dx * dx + dy * dy);
 
       if (distance <= bubble.radius) {
-        
-        // Handle freeze bubbles (removed mechanic, but may still spawn)
-        if (bubble.type === 'freeze') {
-          console.warn('[SurvivalMode] Freeze bubble popped, but mechanic removed. Ignoring.');
-          bubble.popped = true;
-          poppedAny = true;
-          this.consecutivePops = 0;
-          this.consecutiveNormalPops = 0;
-          BubbleSpawnConfig.notifyBubblePopped('freeze', false);
-          break;
-        }
         
         // Handle decoy bubbles
         if (bubble.type === 'decoy') {
