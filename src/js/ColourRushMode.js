@@ -294,12 +294,16 @@ export class ColourRushMode {
       ? Math.round((this.correctPops / this.totalPops) * 100)
       : 0;
 
+    // Calculate star rating
+    const stars = this.calculateStarRating();
+    const starDisplay = stars > 0 ? '⭐'.repeat(stars) : 'No stars';
+
     // ✅ FIX #8: Use consistent goToMainMenu import
     showMessageBox(
       "Time's Up!",
-      `Final Score: ${finalScore} points\nAccuracy: ${accuracy}%`,
-      [{ 
-        label: 'Main Menu', 
+      `Final Score: ${finalScore} points\nAccuracy: ${accuracy}%\n${starDisplay}`,
+      [{
+        label: 'Main Menu',
         action: () => goToMainMenu()
       }]
     );
