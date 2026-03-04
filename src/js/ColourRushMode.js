@@ -910,17 +910,29 @@ export class ColourRushMode {
    */
   applyDifficultyScaling() {
     const level = this.calculateDifficultyLevel();
-    
+
     if (level !== this.difficultyLevel) {
+      const wasHard = this.difficultyLevel >= 3;
+      const isHard = level >= 3;
       this.difficultyLevel = level;
-      
+
       const config = COLOUR_RUSH_CONFIG.difficulty[level] || COLOUR_RUSH_CONFIG.difficulty[5];
-      
+
       this.colorChangeInterval = config.colorChangeInterval;
       this.speedMultiplier = config.speedMultiplier;
-      this.spawnInterval = config.spawnInterval
+      this.spawnInterval = config.spawnInterval;
       this.bubbleRadiusScale = config.radiusScale;
-      
+
+      // Switch color pool based on difficulty: easy colors for levels 1-2, hard (similar hues) for 3+
+      if (isHard !== wasHard) {
+        this.availableColors = isHard
+          ? [...COLOUR_RUSH_CONFIG.colors.hard]
+          : [...COLOUR_RUSH_CONFIG.colors.easy];
+        this.usedColors = [];
+        this.selectNewTargetColor();
+        console.log('[ColourRushMode] Color pool switched to:', isHard ? 'hard' : 'easy');
+      }
+
       console.log('[ColourRushMode] Difficulty level:', level);
     }
   }
