@@ -1,49 +1,58 @@
-## Bubble Pop Frenzy - AI Agent Instructions
+<!-- BMAD:START -->
+# BMAD Method — Project Instructions
 
-This document provides instructions for AI coding agents to effectively contribute to the Bubble Pop Frenzy codebase.
+## Project Configuration
 
-### Big Picture Architecture
+- **Project**: Bubble_Pop_Frenzy
+- **User**: Fahad
+- **Communication Language**: {{communication_language}}
+- **Document Output Language**: {{document_output_language}}
+- **User Skill Level**: intermediate
+- **Output Folder**: _bmad-output
+- **Planning Artifacts**: {project-root}/_bmad-output/planning-artifacts
+- **Implementation Artifacts**: {project-root}/_bmad-output/implementation-artifacts
+- **Project Knowledge**: {project-root}/docs
 
-The game is a vanilla JavaScript application built with Vite. The architecture is modular, centered around a main game orchestrator (`src/js/game.js`) that manages different game modes.
+## BMAD Runtime Structure
 
-- **Entry Point**: `src/js/main.js` initializes the application, sets up the main menu, and loads the initial configuration.
-- **Game Orchestrator**: `src/js/game.js` is the core of the game. It manages the game state, switches between game modes (Classic, Survival, Colour Rush), and provides shared utilities for UI, effects, and game controls.
-- **Game Modes**: Each game mode is a class in its own file (e.g., `src/js/ClassicMode.js`). These classes encapsulate the logic and rules for their specific mode. They are registered with and managed by the `game.js` orchestrator.
-- **Canvas Management**: `src/js/canvasManager.js` handles all interactions with the HTML5 canvas, including rendering, resizing, and user input.
-- **Bubbles**: `src/js/bubbles.js` defines the `Bubble` class, bubble spawning logic, collision detection, and other bubble-related behaviors.
-- **Scoring**: The `src/js/ScoringEngine/` directory contains the scoring logic. `ScoreCalculator.js` and `ScoreConfig.js` are the key files.
-- **UI Components**: Reusable UI components like buttons and message boxes are located in `src/js/ui/`.
-- **Visual Effects**: The `src/js/effects/` directory contains classes for visual effects like bubble pops and floating text.
+- **Agent definitions**: `_bmad/bmm/agents/` (BMM module) and `_bmad/core/agents/` (core)
+- **Workflow definitions**: `_bmad/bmm/workflows/` (organized by phase)
+- **Core tasks**: `_bmad/core/tasks/` (help, editorial review, indexing, sharding, adversarial review)
+- **Core workflows**: `_bmad/core/workflows/` (brainstorming, party-mode, advanced-elicitation)
+- **Workflow engine**: `_bmad/core/tasks/workflow.xml` (executes YAML-based workflows)
+- **Module configuration**: `_bmad/bmm/config.yaml`
+- **Core configuration**: `_bmad/core/config.yaml`
+- **Agent manifest**: `_bmad/_config/agent-manifest.csv`
+- **Workflow manifest**: `_bmad/_config/workflow-manifest.csv`
+- **Help manifest**: `_bmad/_config/bmad-help.csv`
+- **Agent memory**: `_bmad/_memory/`
 
-### Developer Workflows
+## Key Conventions
 
-**Running the Game:**
-- To start the development server, run: `npm run dev`
-- To build the game for production, run: `npm run build`
-- To preview the production build, run: `npm run preview`
+- Always load `_bmad/bmm/config.yaml` before any agent activation or workflow execution
+- Store all config fields as session variables: `{user_name}`, `{communication_language}`, `{output_folder}`, `{planning_artifacts}`, `{implementation_artifacts}`, `{project_knowledge}`
+- MD-based workflows execute directly — load and follow the `.md` file
+- YAML-based workflows require the workflow engine — load `workflow.xml` first, then pass the `.yaml` config
+- Follow step-based workflow execution: load steps JIT, never multiple at once
+- Save outputs after EACH step when using the workflow engine
+- The `{project-root}` variable resolves to the workspace root at runtime
 
-**Testing:**
-The project uses Puppeteer for end-to-end testing. The test files are in the `tests/` directory. To run the tests, you will need to execute the test scripts with Node.js. For example:
-`node tests/puppeteer-test-tc101.js`
+## Available Agents
 
-### Project-Specific Conventions
+| Agent | Persona | Title | Capabilities |
+|---|---|---|---|
+| bmad-master | BMad Master | BMad Master Executor, Knowledge Custodian, and Workflow Orchestrator | runtime resource management, workflow orchestration, task execution, knowledge custodian |
+| analyst | Mary | Business Analyst | market research, competitive analysis, requirements elicitation, domain expertise |
+| architect | Winston | Architect | distributed systems, cloud infrastructure, API design, scalable patterns |
+| dev | Amelia | Developer Agent | story execution, test-driven development, code implementation |
+| pm | John | Product Manager | PRD creation, requirements discovery, stakeholder alignment, user interviews |
+| qa | Quinn | QA Engineer | test automation, API testing, E2E testing, coverage analysis |
+| quick-flow-solo-dev | Barry | Quick Flow Solo Dev | rapid spec creation, lean implementation, minimum ceremony |
+| sm | Bob | Scrum Master | sprint planning, story preparation, agile ceremonies, backlog management |
+| tech-writer | Paige | Technical Writer | agent capabilities |
+| ux-designer | Sally | UX Designer | user research, interaction design, UI patterns, experience strategy |
 
-- **Modularity**: The codebase is highly modular. When adding new features, try to follow the existing modular structure. For example, a new game mode should be a new class in its own file.
-- **Game Mode Registration**: New game modes must be registered in `src/js/game.js` in the `MODE_REGISTRY` and initialized in the `initializeModes` function.
-- **Shared Utilities**: `src/js/game.js` exports a set of shared utilities (e.g., `spawnPointsText`, `setBackButtonVisible`). Use these utilities when possible to maintain consistency.
-- **Configuration-Driven**: Game parameters like bubble spawn rates and scoring are defined in configuration files (e.g., `src/js/BubbleSpawnConfig.js`, `src/js/ScoringEngine/ScoreConfig.js`). When balancing the game, these are the files you should modify.
-- **State Management**: The main game state is managed by `game.js` and the active game mode. Avoid creating global state variables.
+## Slash Commands
 
-### Key Files and Directories
-
-- `src/js/main.js`: Application entry point.
-- `src/js/game.js`: The central game orchestrator.
-- `src/js/canvasManager.js`: Manages the HTML5 canvas.
-- `src/js/bubbles.js`: Defines the `Bubble` class and related logic.
-- `src/js/ClassicMode.js`, `src/js/SurvivalMode.js`, `src/js/ColourRushMode.js`: Game mode implementations.
-- `src/js/ScoringEngine/`: Scoring logic.
-- `src/js/ui/`: UI components.
-- `src/js/effects/`: Visual effects.
-- `vite.config.js`: Vite configuration.
-- `package.json`: Project dependencies and scripts.
-- `tests/`: End-to-end tests.
+Type `/bmad-` in Copilot Chat to see all available BMAD workflows and agent activators. Agents are also available in the agents dropdown.
+<!-- BMAD:END -->
