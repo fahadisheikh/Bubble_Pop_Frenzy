@@ -34,16 +34,16 @@ async function runTestTC101() {
         }
         console.log('✅ Message box (#messageBox) is visible.');
 
-        // 4. Now that the message box is visible, wait for ANY button inside the messageBoxButtons container.
+        // 4. Now that the message box is visible, wait for ANY button inside the buttonContainer container.
         // This is more robust as it waits for the element to exist and be visible,
         // rather than relying on the :contains pseudo-selector for initial visibility.
-        const buttonSelector = '#messageBoxButtons button';
+        const buttonSelector = '#buttonContainer button';
         await page.waitForSelector(buttonSelector, { visible: true, timeout: 10000 });
 
         // 5. Once a button is visible, evaluate in the browser context to find the "Continue" button.
         // This is more reliable for checking text content of dynamically added elements.
         const continueButtonFound = await page.evaluate(() => {
-            const buttons = Array.from(document.querySelectorAll('#messageBoxButtons button'));
+            const buttons = Array.from(document.querySelectorAll('#buttonContainer button'));
             // Trim to account for any potential whitespace around the text content
             return buttons.some(button => button.textContent.trim() === 'Continue');
         });
