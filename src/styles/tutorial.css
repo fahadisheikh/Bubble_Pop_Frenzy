@@ -1,0 +1,284 @@
+/* src/styles/tutorial.css */
+/* First-run tutorial overlay for Bubble Pop Frenzy */
+
+/* ============================================================
+   OVERLAY BACKDROP
+   ============================================================ */
+
+.tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: rgba(20, 10, 40, 0.82);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  box-sizing: border-box;
+  /* Entrance / exit */
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  touch-action: manipulation;
+}
+
+.tutorial-overlay.tutorial-visible {
+  opacity: 1;
+}
+
+.tutorial-overlay.tutorial-exit {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ============================================================
+   SKIP BUTTON (top-right)
+   ============================================================ */
+
+.tutorial-skip {
+  position: absolute;
+  top: max(1rem, env(safe-area-inset-top, 1rem));
+  right: 1rem;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.95rem;
+  padding: 0.45rem 1rem;
+  border-radius: 50px;
+  cursor: pointer;
+  min-height: 44px;
+  min-width: 64px;
+  z-index: 9001;
+  transition: background 0.2s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tutorial-skip:hover,
+.tutorial-skip:active {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+/* ============================================================
+   PANEL CARD
+   ============================================================ */
+
+.tutorial-card {
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  padding: 2rem 1.75rem 1.75rem;
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+/* ============================================================
+   VISUAL AREA
+   ============================================================ */
+
+.tutorial-visual {
+  width: 100%;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---- Bubble visuals ---- */
+
+.tut-bubble {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.tut-bubble-regular {
+  background: radial-gradient(circle at 35% 35%, #80DEEA, #29B6F6 60%, #0277BD);
+  border: 3px solid rgba(255, 255, 255, 0.7);
+}
+
+.tut-bubble-dark {
+  background: radial-gradient(circle at 35% 35%, #546E7A, #263238 60%, #0A0A0A);
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+/* ---- Mode icons visual ---- */
+
+.tut-mode-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.tut-mode-dot {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.7);
+}
+
+.tut-mode-label {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.7rem;
+  color: #444;
+  white-space: nowrap;
+}
+
+.bubble-bounce .tut-bubble-regular {
+  /* modes-preview container uses flexbox gap */
+}
+
+.modes-preview {
+  gap: 1.25rem;
+}
+
+/* ============================================================
+   TEXT
+   ============================================================ */
+
+.tutorial-title {
+  font-family: 'Bangers', cursive;
+  font-size: clamp(1.4rem, 5vw, 1.8rem);
+  color: #FF6347;
+  margin: 0;
+  line-height: 1.15;
+  letter-spacing: 0.5px;
+}
+
+.tutorial-body {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(0.95rem, 3.5vw, 1.1rem);
+  color: #555;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ============================================================
+   DOTS INDICATOR
+   ============================================================ */
+
+.tutorial-dots {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.tutorial-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ccc;
+  transition: background 0.25s, transform 0.25s;
+}
+
+.tutorial-dot.active {
+  background: #FF6347;
+  transform: scale(1.35);
+}
+
+/* ============================================================
+   NEXT / FINISH BUTTON
+   ============================================================ */
+
+.tutorial-next-btn {
+  background: linear-gradient(145deg, #FF7E5F, #FEB47B);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 0.75rem 2rem;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(255, 126, 95, 0.5);
+  min-height: 48px;
+  min-width: 140px;
+  transition: transform 0.15s, box-shadow 0.15s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tutorial-next-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 126, 95, 0.6);
+}
+
+.tutorial-next-btn:active {
+  transform: translateY(0);
+}
+
+/* ============================================================
+   BUBBLE ANIMATIONS
+   ============================================================ */
+
+@keyframes bubble-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%       { transform: translateY(-12px) scale(1.08); }
+}
+
+@keyframes bubble-shake {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  20%       { transform: rotate(-8deg) scale(1.05); }
+  40%       { transform: rotate(8deg) scale(1.05); }
+  60%       { transform: rotate(-5deg) scale(1); }
+  80%       { transform: rotate(5deg) scale(1); }
+}
+
+.bubble-bounce .tut-bubble {
+  animation: bubble-bounce 1.4s ease-in-out infinite;
+}
+
+.bubble-shake .tut-bubble {
+  animation: bubble-shake 1.2s ease-in-out infinite;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 380px) {
+  .tutorial-card {
+    padding: 1.5rem 1.25rem;
+    gap: 0.65rem;
+  }
+
+  .tut-bubble {
+    width: 58px;
+    height: 58px;
+    font-size: 1.6rem;
+  }
+
+  .tut-mode-dot {
+    width: 32px;
+    height: 32px;
+  }
+
+  .tutorial-visual {
+    height: 80px;
+  }
+}
+
+@media (max-height: 560px) and (orientation: portrait) {
+  .tutorial-visual {
+    height: 70px;
+  }
+  .tutorial-card {
+    gap: 0.5rem;
+    padding: 1.25rem 1.25rem;
+  }
+}

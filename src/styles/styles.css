@@ -3,6 +3,9 @@
 /* Import title animations */
 @import url('./title-animations.css');
 
+/* Import tutorial overlay */
+@import url('./tutorial.css');
+
 body {
   font-family: 'Inter', sans-serif;
   background: #faf0e6; /*page background*/
@@ -165,6 +168,16 @@ canvas.canvas-appearing {
   font-size: 1.2rem;
   margin-bottom: 1.5rem;
   color: #333;
+  white-space: pre-line;
+}
+
+.message-box button .btn-sub-label {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  opacity: 0.85;
+  margin-top: 2px;
+  letter-spacing: 0;
 }
 
 .message-box button {

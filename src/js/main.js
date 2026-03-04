@@ -22,6 +22,9 @@ import { COLOUR_RUSH_CONFIG, validateConfig as validateColourRushConfig } from '
 // Import game title management system
 import { initializeAnimatedTitle } from './gametitlemanagement/index.js';
 
+// Import first-run tutorial overlay
+import { TutorialOverlay } from './tutorial/TutorialOverlay.js';
+
 /* ===========================================================================
    CONFIGURATION VALIDATION
    ===========================================================================*/
@@ -62,52 +65,60 @@ function validateAllConfigs() {
  */
 async function showMainMenu(gameConfig) {
   console.log('[main.js] Showing main menu');
-  
+
   // Hide any existing UI elements
   if (gameConfig.gameInfo) {
     gameConfig.gameInfo.style.display = 'none';
   }
-  
+
   // Get spawn information for each mode
   const classicBubbleTypes = BubbleSpawnConfig.getAvailableBubbleTypes('classic');
   const survivalBubbleTypes = BubbleSpawnConfig.getAvailableBubbleTypes('survival');
   const colourRushBubbleTypes = BubbleSpawnConfig.getAvailableBubbleTypes('colourrush');
-  
+
   console.log('[main.js] Available bubble types:');
   console.log('  Classic:', classicBubbleTypes);
   console.log('  Survival:', survivalBubbleTypes);
   console.log('  Colour Rush:', colourRushBubbleTypes);
-  
+
   // Show mode selection message box
   showMessageBox(
     'Bubble Pop Frenzy!',
     'Select a game mode to begin.',
     [
-      { 
-        label: 'Classic Mode', 
-        action: async () => { 
+      {
+        label: 'Classic Mode',
+        action: async () => {
           console.log('[main.js] Starting Classic Mode');
-          await hideMessageBox(); 
-          startGame(gameConfig, 'classic'); 
-        } 
+          await hideMessageBox();
+          startGame(gameConfig, 'classic');
+        }
       },
-      { 
-        label: 'Survival Mode', 
-        action: async () => { 
+      {
+        label: 'Survival Mode',
+        action: async () => {
           console.log('[main.js] Starting Survival Mode');
-          await hideMessageBox(); 
-          startGame(gameConfig, 'survival'); 
-        } 
+          await hideMessageBox();
+          startGame(gameConfig, 'survival');
+        }
       },
-      { 
-        label: 'Colour Rush', 
-        action: async () => { 
+      {
+        label: 'Colour Rush',
+        action: async () => {
           console.log('[main.js] Starting Colour Rush Mode');
           await hideMessageBox();
           gameConfig.gameInfo.style.display = 'flex';
           await gameConfig.canvasManager.showWithAnimation();
-          startGame(gameConfig, 'colourrush'); 
-        } 
+          startGame(gameConfig, 'colourrush');
+        }
+      },
+      {
+        label: '? How to Play',
+        action: async () => {
+          console.log('[main.js] Showing tutorial (on-demand)');
+          const tutorial = new TutorialOverlay();
+          await tutorial.show(); // ignore seen flag for on-demand access
+        }
       }
     ]
   );
@@ -120,7 +131,7 @@ async function showMainMenu(gameConfig) {
 /**
  * Initialize the game on page load
  */
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
   console.log('[main.js] ========================================');
   console.log('[main.js] Bubble Pop Frenzy - Initializing...');
   console.log('[main.js] ========================================');
@@ -238,8 +249,20 @@ window.addEventListener('load', () => {
       console.warn('[main.js] ⚠️ Title element (.game-title) not found - skipping animation');
     }
     
-    // Step 8: Show main menu
-    console.log('[main.js] Step 8: Showing main menu...');
+    // Step 8: Show first-run tutorial (if never seen before)
+    console.log('[main.js] Step 8: Checking first-run tutorial...');
+    const tutorial = new TutorialOverlay();
+    if (tutorial.shouldShow()) {
+      console.log('[main.js] First run detected — showing tutorial');
+      await tutorial.show();
+      tutorial.markSeen();
+      console.log('[main.js] Tutorial dismissed — proceeding to main menu');
+    } else {
+      console.log('[main.js] Tutorial already seen — skipping');
+    }
+
+    // Step 9: Show main menu
+    console.log('[main.js] Step 9: Showing main menu...');
     showMainMenu(gameConfig);
     
     // Store gameConfig for debug utilities
