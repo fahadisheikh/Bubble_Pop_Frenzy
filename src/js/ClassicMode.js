@@ -4,6 +4,7 @@
 import { Bubble, spawnBubble, handleBubbleCollision } from './bubbles.js';
 import { showMessageBox } from './ui/messageBox.js';
 import { highScoreService } from './services/HighScoreService.js';
+import { audioManager } from './audio/AudioManager.js';
 import { FloatingTextEffect } from './effects/FloatingTextEffect.js';
 import {
   effects,
@@ -271,8 +272,10 @@ export class ClassicMode {
       );
 
       // In classic mode, missed bubbles don't affect gameplay
-      // They just disappear
-      
+      if (missed) {
+        audioManager.play('miss');
+      }
+
       if (bubble.dead) {
         this.bubbles.splice(i, 1);
       }
@@ -314,19 +317,20 @@ export class ClassicMode {
         // Handle decoy bubbles
         if (bubble.type === 'decoy') {
           const res = scoringService.handleBubblePop('decoy');
-          
+
           spawnPointsText(res.pointsEarned, bubble.x, bubble.y, '#ff7777');
+          audioManager.play('penalty');
 
           bubble.popped = true;
           poppedAny = true;
           this.consecutivePops = 0;
           this.consecutiveNormalPops = 0;
-          
+
           BubbleSpawnConfig.notifyBubblePopped('decoy', false);
-          
+
           break;
         }
-        
+
         // Handle normal and double bubbles
         if (bubble.pop(performance.now())) {
           const res = scoringService.handleBubblePop(bubble.type);
@@ -334,13 +338,19 @@ export class ClassicMode {
           poppedAny = true;
 
           this.consecutivePops += 1;
-          
+
           if (bubble.type === 'normal') {
             this.consecutiveNormalPops += 1;
+            audioManager.play('pop_normal');
+          } else if (bubble.type === 'double') {
+            // double bubble: pop_soft on first tap (handled by bubble.pop returning false),
+            // pop_double on final pop
+            audioManager.play('pop_double');
+            this.consecutiveNormalPops = 0;
           } else {
             this.consecutiveNormalPops = 0;
           }
-          
+
           BubbleSpawnConfig.notifyBubblePopped(bubble.type, true);
 
           if ('vibrate' in navigator) {
@@ -348,6 +358,9 @@ export class ClassicMode {
           }
 
           break;
+        } else if (bubble.type === 'double') {
+          // First tap on a double bubble
+          audioManager.play('pop_soft');
         }
       }
     }
@@ -405,6 +418,7 @@ export class ClassicMode {
    * End the game and show results
    */
   endGame() {
+    audioManager.play('game_over_jingle');
     this.cleanup();
 
     const stats = scoringService.getCurrentStats();

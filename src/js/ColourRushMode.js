@@ -2,6 +2,7 @@
 // Colour Rush Game Mode - Match target colors for points and combos
 
 import { showMessageBox, hideMessageBox } from './ui/messageBox.js';
+import { audioManager } from './audio/AudioManager.js';
 import { highScoreService } from './services/HighScoreService.js';
 import { 
   Bubble, 
@@ -85,6 +86,7 @@ export class ColourRushMode {
     // Audio/Haptic support
     this.audioEnabled = true;
     this.hapticEnabled = 'vibrate' in navigator;
+    this._urgencyPlayed = false;
   }
   
   /* ===========================================================================
@@ -116,6 +118,7 @@ export class ColourRushMode {
     this.speedMultiplier = 1.0;
     this.spawnInterval = 1000;
     this.bubbleRadiusScale = 1.0;
+    this._urgencyPlayed = false;
     
     // ✅ FIX #2: Reset spawn state like Classic/Survival
     BubbleSpawnConfig.resetSpawnState();
@@ -285,7 +288,8 @@ export class ColourRushMode {
    */
   endGame() {
     console.log('[ColourRushMode] Ending game...');
-    
+    audioManager.play('game_over_jingle');
+
     // Cleanup resources first
     this.cleanup();
 
@@ -431,7 +435,13 @@ export class ColourRushMode {
       this.endGame();
       return;
     }
-    
+
+    // Urgency sound when time is running low
+    if (this.timeRemaining < 10 && !this._urgencyPlayed) {
+      audioManager.play('cr_urgency');
+      this._urgencyPlayed = true;
+    }
+
     // Update difficulty
     this.applyDifficultyScaling();
     
@@ -696,20 +706,29 @@ export class ColourRushMode {
   updateCombo(isCorrect) {
     if (isCorrect) {
       this.consecutiveCorrect++;
-      
+
       // Update multiplier based on thresholds
       const thresholds = COLOUR_RUSH_CONFIG.scoring.comboThresholds;
-      
-      if (this.consecutiveCorrect >= 10) {
+
+      if (this.consecutiveCorrect === 10) {
         this.comboMultiplier = thresholds[10];
-      } else if (this.consecutiveCorrect >= 5) {
+        audioManager.play('cr_combo_10');
+      } else if (this.consecutiveCorrect === 5) {
         this.comboMultiplier = thresholds[5];
-      } else if (this.consecutiveCorrect >= 3) {
+        audioManager.play('cr_combo_5');
+      } else if (this.consecutiveCorrect === 3) {
+        this.comboMultiplier = thresholds[3];
+        audioManager.play('cr_combo_3');
+      } else if (this.consecutiveCorrect > 10) {
+        this.comboMultiplier = thresholds[10];
+      } else if (this.consecutiveCorrect > 5) {
+        this.comboMultiplier = thresholds[5];
+      } else if (this.consecutiveCorrect > 3) {
         this.comboMultiplier = thresholds[3];
       } else {
         this.comboMultiplier = 1.0;
       }
-      
+
       console.log(`[ColourRushMode] Combo: ${this.consecutiveCorrect} (${this.comboMultiplier}x)`);
     } else {
       // Break combo
@@ -720,7 +739,7 @@ export class ColourRushMode {
           this.comboMeter.shatter();
         }
       }
-      
+
       this.consecutiveCorrect = 0;
       this.comboMultiplier = 1.0;
     }
@@ -1048,16 +1067,22 @@ export class ColourRushMode {
      ===========================================================================*/
   
   /**
-   * Play sound effect
+   * Play sound effect via AudioManager
    */
   playSound(soundKey) {
     if (!this.audioEnabled) return;
-    
-    // Placeholder for audio system integration
-    console.log('[ColourRushMode] Play sound:', soundKey);
-    
-    // TODO: Integrate with AudioManager when implemented
-    // Example: AudioManager.playSound(COLOUR_RUSH_CONFIG.audio[soundKey]);
+
+    // Map ColourRush config keys to AudioManager keys
+    const keyMap = {
+      correctPop: 'cr_correct',
+      wrongPop: 'cr_wrong',
+      colorChange: 'cr_color_change',
+      comboBreak: 'cr_combo_break',
+      perfectRound: 'cr_perfect',
+    };
+
+    const resolvedKey = keyMap[soundKey] || soundKey;
+    audioManager.play(resolvedKey);
   }
   
   /**

@@ -9,5 +9,8 @@
   "devDependencies": {
     "bmad-game-dev-studio": "^0.1.10",
     "vite": "^7.0.5"
+  },
+  "dependencies": {
+    "howler": "^2.2.4"
   }
 }

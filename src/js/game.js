@@ -2,6 +2,7 @@
 // Parent Game Orchestrator - Manages game modes and provides shared utilities
 
 import { showMessageBox, hideMessageBox } from './ui/messageBox.js';
+import { audioManager } from './audio/AudioManager.js';
 import { FloatingTextEffect } from './effects/FloatingTextEffect.js';
 import { effects } from './effects/EffectManager.js';
 import { CountdownTextEffect } from './effects/CountdownTextEffect.js';
@@ -132,7 +133,13 @@ async function startCountdown(config) {
   requestAnimationFrame(loop);
 
   for (let i = 0; i < countdownValues.length; i++) {
-    effects.spawn(new CountdownTextEffect(countdownValues[i], 500));
+    const val = countdownValues[i];
+    effects.spawn(new CountdownTextEffect(val, 500));
+    if (val === 'Pop!') {
+      audioManager.play('countdown_go');
+    } else {
+      audioManager.play('countdown_beep');
+    }
     await new Promise(r => setTimeout(r, 500));
   }
 

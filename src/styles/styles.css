@@ -78,7 +78,8 @@ canvas.canvas-appearing {
 /* High-contrast circular button - WHITE background with BLACK icons */
 .back-btn,
 .restart-btn,
-.pause-btn {
+.pause-btn,
+.mute-btn {
   touch-action: manipulation;  /* eliminates 300ms delay on some UAs */
   -webkit-tap-highlight-color: transparent; /* nicer tap highlight on iOS */
   user-select: none;           /* avoids text selection during taps */
@@ -101,7 +102,8 @@ canvas.canvas-appearing {
 
 .back-btn svg,
 .restart-btn svg,
-.pause-btn svg {
+.pause-btn svg,
+.mute-btn svg {
   width: 32px;
   height: 32px;
   flex: 0 0 auto;
@@ -109,20 +111,28 @@ canvas.canvas-appearing {
 
 .back-btn:active,
 .restart-btn:active,
-.pause-btn:active { 
+.pause-btn:active,
+.mute-btn:active {
   filter: brightness(0.9); /* Slightly darken on press */
 }
 
 /* Hidden by default; shown only during gameplay */
 .back-btn.hidden,
 .restart-btn.hidden,
-.pause-btn.hidden {
+.pause-btn.hidden,
+.mute-btn.hidden {
   display: none;
+}
+
+.mute-btn {
+  font-size: 1.4rem;
+  line-height: 1;
 }
 
 .back-btn:focus-visible,
 .restart-btn:focus-visible,
-.pause-btn:focus-visible {
+.pause-btn:focus-visible,
+.mute-btn:focus-visible {
   outline: 3px solid #FFF;
   outline-offset: 3px;
 }

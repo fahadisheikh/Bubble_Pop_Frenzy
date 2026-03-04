@@ -4,8 +4,8 @@
 
 import { CanvasManager } from './canvasManager.js';
 import { showMessageBox, hideMessageBox } from './ui/messageBox.js';
-import { 
-  startGame, 
+import {
+  startGame,
   handleCanvasPointerDown,
   initializeModes,
   showModeSelection,
@@ -17,6 +17,8 @@ import { BubbleSpawnConfig } from './BubbleSpawnConfig.js';
 import { PauseButton } from './ui/PauseButton.js';
 import { BackButton } from './ui/BackButton.js';
 import { RestartButton } from './ui/RestartButton.js';
+import { MuteButton } from './ui/MuteButton.js';
+import { audioManager } from './audio/AudioManager.js';
 import { COLOUR_RUSH_CONFIG, validateConfig as validateColourRushConfig } from './ColourRushConfig.js';
 
 // Import game title management system
@@ -173,6 +175,7 @@ window.addEventListener('load', async () => {
     const backButton = new BackButton(belowCanvasArea);
     const pauseButton = new PauseButton(belowCanvasArea);
     const restartButton = new RestartButton(belowCanvasArea);
+    const muteButton = new MuteButton(belowCanvasArea, audioManager);
     
     // Build game configuration object (needed for button handlers)
     const gameConfig = {
@@ -218,13 +221,22 @@ window.addEventListener('load', async () => {
     
     // Step 6: Setup pointer events
     console.log('[main.js] Step 6: Setting up pointer events...');
+
+    // Init audio on first user gesture (required by mobile browsers)
+    const initAudioOnce = () => {
+      audioManager.init();
+      audioManager.resumeContext();
+      document.removeEventListener('pointerdown', initAudioOnce, true);
+    };
+    document.addEventListener('pointerdown', initAudioOnce, true);
+
     canvas.addEventListener('pointerdown', (event) => {
       const rect = canvas.getBoundingClientRect();
       const scaleX = canvas.width / rect.width;
       const scaleY = canvas.height / rect.height;
       const x = (event.clientX - rect.left) * scaleX;
       const y = (event.clientY - rect.top) * scaleY;
-      
+
       handleCanvasPointerDown(x, y);
     });
     

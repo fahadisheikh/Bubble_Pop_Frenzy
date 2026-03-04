@@ -4,6 +4,7 @@
 import { Bubble, spawnBubble, handleBubbleCollision } from './bubbles.js';
 import { showMessageBox } from './ui/messageBox.js';
 import { highScoreService } from './services/HighScoreService.js';
+import { audioManager } from './audio/AudioManager.js';
 import { FloatingTextEffect } from './effects/FloatingTextEffect.js';
 import {
   effects,
@@ -44,7 +45,11 @@ export class SurvivalMode {
     this.config = config;
     this.canvas = config.canvasManager.element;
     this.ctx = config.canvasManager.context;
-    
+
+    // Audio state
+    this._urgencyPlayed = false;
+    this._crUrgencyPlayed = false;
+
     // Game state
     this.bubbles = [];
     this.gameActive = false;
@@ -114,6 +119,7 @@ export class SurvivalMode {
     this.timeLeft = SURVIVAL_CONSTANTS.STARTING_TIME;
     this.difficultyLevel = 1;
     this.lastIncreaseType = 'spawn';
+    this._urgencyPlayed = false;
 
     // Reset systems
     if (scoringService?.reset) {
@@ -243,6 +249,12 @@ export class SurvivalMode {
     if (now - this.lastDifficultyIncreaseTime > SURVIVAL_CONSTANTS.DIFFICULTY_INCREASE_INTERVAL) {
       this.difficultyLevel += 1;
 
+      // Play urgency alert once when player is struggling
+      if (this.playerMissRate > SURVIVAL_CONSTANTS.MAX_ALLOWED_MISS_RATE && !this._urgencyPlayed) {
+        audioManager.play('urgency_alert');
+        this._urgencyPlayed = true;
+      }
+
       let speedIncreaseAmount = 0.4;
 
       if (this.lastIncreaseType === 'spawn') {
@@ -345,7 +357,8 @@ export class SurvivalMode {
         this.bubblesMissed += 1;
         this.consecutivePops = 0;
         this.consecutiveNormalPops = 0;
-        
+        audioManager.play('miss');
+
         BubbleSpawnConfig.notifyBubbleMissed();
       }
       
@@ -390,22 +403,23 @@ export class SurvivalMode {
         // Handle decoy bubbles
         if (bubble.type === 'decoy') {
           const res = scoringService.handleBubblePop('decoy');
-          
+
           this.timeLeft -= SURVIVAL_CONSTANTS.TIME_PENALTY_PER_DECOY;
           effects.spawn(new FloatingTextEffect(this.canvas.width / 2, 50, '-5s', '#ff5555'));
-          
+
           spawnPointsText(res.pointsEarned, bubble.x, bubble.y, '#ff7777');
+          audioManager.play('penalty');
 
           bubble.popped = true;
           poppedAny = true;
           this.consecutivePops = 0;
           this.consecutiveNormalPops = 0;
-          
+
           BubbleSpawnConfig.notifyBubblePopped('decoy', false);
-          
+
           break;
         }
-        
+
         // Handle normal and double bubbles
         if (bubble.pop(performance.now())) {
           const res = scoringService.handleBubblePop(bubble.type);
@@ -415,11 +429,13 @@ export class SurvivalMode {
           // Time bonuses for survival mode
           if (bubble.type === 'normal') {
             this.consecutiveNormalPops += 1;
-            
+            audioManager.play('pop_normal');
+
             // Every 2 consecutive normal pops gives +1s
             if (this.consecutiveNormalPops % 2 === 0) {
               this.timeLeft += 1;
               effects.spawn(new FloatingTextEffect(this.canvas.width / 2, 50, '+1s', bubble.color));
+              audioManager.play('time_bonus');
             }
           } else if (bubble.type === 'double') {
             this.timeLeft += SURVIVAL_CONSTANTS.TIME_BONUS_PER_DOUBLE_TAP;
@@ -429,16 +445,18 @@ export class SurvivalMode {
               '+1s',
               bubble.initialColor || '#ffffff'
             ));
+            audioManager.play('pop_double');
+            audioManager.play('time_bonus');
             this.consecutiveNormalPops = 0;
           } else {
             this.consecutiveNormalPops = 0;
           }
-          
+
           // Cap time at maximum
           this.timeLeft = Math.min(this.timeLeft, SURVIVAL_CONSTANTS.MAX_TIME);
 
           this.consecutivePops += 1;
-          
+
           BubbleSpawnConfig.notifyBubblePopped(bubble.type, true);
 
           if ('vibrate' in navigator) {
@@ -446,6 +464,9 @@ export class SurvivalMode {
           }
 
           break;
+        } else if (bubble.type === 'double') {
+          // First tap on a double bubble
+          audioManager.play('pop_soft');
         }
       }
     }
@@ -504,6 +525,7 @@ export class SurvivalMode {
    * End the game and show results
    */
   endGame() {
+    audioManager.play('game_over_jingle');
     this.cleanup();
 
     const stats = scoringService.getCurrentStats();
