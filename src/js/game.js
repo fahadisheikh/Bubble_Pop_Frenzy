@@ -7,6 +7,7 @@ import { effects } from './effects/EffectManager.js';
 import { CountdownTextEffect } from './effects/CountdownTextEffect.js';
 import { scoringService } from './ScoringEngine/index.js';
 import { BubbleSpawnConfig } from './BubbleSpawnConfig.js';
+import { highScoreService } from './services/HighScoreService.js';
 
 // Import game mode implementations
 import { ClassicMode } from './ClassicMode.js';
@@ -359,30 +360,38 @@ async function showModeSelection() {
   setPauseButtonVisible(false);
   setRestartButtonVisible(false);
 
+  const scores = highScoreService.getAllScores();
+
+  const formatBest = (score) =>
+    score > 0 ? score.toLocaleString() + ' pts' : '—';
+
   showMessageBox(
     'Select Mode',
     'Choose your game mode:',
     [
-      { 
-        label: 'Classic Mode', 
-        action: async () => { 
-          await hideMessageBox(); 
-          startGame(gameConfig, 'classic'); 
-        } 
+      {
+        label: 'Classic Mode',
+        subLabel: 'Best: ' + formatBest(scores.classic),
+        action: async () => {
+          await hideMessageBox();
+          startGame(gameConfig, 'classic');
+        }
       },
-      { 
-        label: 'Survival Mode', 
-        action: async () => { 
-          await hideMessageBox(); 
-          startGame(gameConfig, 'survival'); 
-        } 
+      {
+        label: 'Survival Mode',
+        subLabel: 'Best: ' + formatBest(scores.survival),
+        action: async () => {
+          await hideMessageBox();
+          startGame(gameConfig, 'survival');
+        }
       },
-      { 
+      {
         label: 'Colour Rush',
-        action: async () => { 
-          await hideMessageBox(); 
-          startGame(gameConfig, 'colourrush'); 
-        } 
+        subLabel: 'Best: ' + formatBest(scores.colourrush),
+        action: async () => {
+          await hideMessageBox();
+          startGame(gameConfig, 'colourrush');
+        }
       }
     ]
   );

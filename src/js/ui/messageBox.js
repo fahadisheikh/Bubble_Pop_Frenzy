@@ -20,17 +20,24 @@ function showMessageBox(title, text, buttons = []) {
   buttonContainer.innerHTML = '';
 
   // Helper function to create a button
-  const createButton = (label, action, index) => {
+  const createButton = (label, subLabel, action, index) => {
     const btn = document.createElement("button");
     btn.textContent = label;
-    
+
+    if (subLabel) {
+      const sub = document.createElement('span');
+      sub.className = 'btn-sub-label';
+      sub.textContent = subLabel;
+      btn.appendChild(sub);
+    }
+
     // Add optional classes based on button position for styling
     if (index === 1) {
       btn.className = 'secondary';
     } else if (index === 2) {
       btn.className = 'tertiary';
     }
-    
+
     btn.onclick = action;
     return btn;
   };
@@ -38,7 +45,7 @@ function showMessageBox(title, text, buttons = []) {
   // Create and append all buttons from the array
   buttons.forEach((button, index) => {
     if (button && button.label && button.action) {
-      buttonContainer.appendChild(createButton(button.label, button.action, index));
+      buttonContainer.appendChild(createButton(button.label, button.subLabel || null, button.action, index));
     } else {
       console.warn('Invalid button object at index', index, button);
     }
