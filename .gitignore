@@ -1,2 +1,5 @@
 node_modules
 _bmad-output/
+android/.gradle/
+android/app/build/
+android/build/
